@@ -2,8 +2,52 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("JavaScript is loaded and running!");
 });
 
+const sampleData = [
+  [-23, 141, "object 1"],
+  [-24, 144, "object 2"],
+  [-21, 143, "object 3"],
+  [-28, 145, "object 4"],
+  [-27, 150, "object 5"],
+  [-28, 151, "object 6"],
+  [-19, 145, "object 7"],
+  [-23, 148, "object 8"],
+  [-28, 149, "object 9"],
+];
+
 // Set map from Leaflet 1.9.4
 var map = L.map("map").setView([-21, 147], 5.4);
+
+var vis_layer = [];
+
+function revealNodes(north, south, east, west) {
+  var new_layer = [];
+
+  sampleData.forEach((e) => {
+    if (e[1] > north && e[1] < south && e[0] < east && e[0] > west) {
+      var x = new L.Marker([e[0], e[1]], { title: e[2] });
+      new_layer.push(x);
+    }
+  });
+
+  vis_layer = new_layer;
+  asset_text = "";
+  vis_layer.forEach(
+    (e) => (asset_text += (asset_text ? ", " : "") + e.options.title)
+  );
+  console.log(asset_text);
+  document.getElementById("assets").textContent = `${asset_text}`;
+}
+
+sampleData.forEach((e) => {
+  var x = new L.Marker([e[0], e[1]], { id: e[2] });
+  vis_layer.push(x);
+});
+
+var nodeGroup; /* = L.featureGroup(vis_layer)
+  .on("click", function () {
+    alert(`clicked on ${vis_layer}`);
+  })
+  .addTo(map);*/
 
 // Mouse event listener
 map.on("click", onMapClick);
@@ -13,21 +57,25 @@ var marker;
 function onMapClick(e) {
   // Remove previous marker
   marker?.remove();
+  nodeGroup?.remove();
 
   // Add new marker at mouse click position
   marker = new L.Rectangle(
     [
-      [e.latlng.lat - 1, e.latlng.lng - 1],
-      [e.latlng.lat + 1, e.latlng.lng + 1],
+      [e.latlng.lat - 2, e.latlng.lng - 2],
+      [e.latlng.lat + 2, e.latlng.lng + 2],
     ],
-    { opacity: 0.1 }
+    { opacity: 0.2 }
   );
 
+  revealNodes(
+    e.latlng.lng - 2,
+    e.latlng.lng + 2,
+    e.latlng.lat + 2,
+    e.latlng.lat - 2
+  );
   map.addLayer(marker);
-  const latlngs = marker.getLatLngs();
-  document.getElementById(
-    "coordinates"
-  ).textContent = `Coordinates: ${latlngs}`;
+  nodeGroup = L.featureGroup(vis_layer).addTo(map);
 }
 
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
