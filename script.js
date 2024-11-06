@@ -1,7 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("JavaScript is loaded and running!");
-});
-
+// Sample data for "assets"
 const sampleData = [
   [-27.5, 153, "Brisbane"],
   [-28, 153, "Gold Coast"],
@@ -21,11 +18,22 @@ const sampleData = [
 // Set map from Leaflet 1.9.4
 var map = L.map("map").setView([-21, 147], 5.4);
 
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 17,
+  minZoom: 5,
+  attribution:
+    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+}).addTo(map);
+
+map.on("click", onMapClick);
+
 var vis_layer = [];
 
+// Return the markers within the specified area
 function revealNodes(north, south, east, west) {
   var new_layer = [];
 
+  // replace with call to DB in future
   sampleData.forEach((e) => {
     if (e[1] > north && e[1] < south && e[0] < east && e[0] > west) {
       var x = new L.Marker([e[0], e[1]], { title: e[2] });
@@ -33,31 +41,13 @@ function revealNodes(north, south, east, west) {
     }
   });
 
-  vis_layer = new_layer;
-  asset_text = "";
-  vis_layer.forEach(
-    (e) => (asset_text += (asset_text ? ", " : "") + e.options.title)
-  );
-  console.log(asset_text);
-  document.getElementById("assets").textContent = `${asset_text}`;
+  return new_layer;
 }
 
-sampleData.forEach((e) => {
-  var x = new L.Marker([e[0], e[1]], { id: e[2] });
-  vis_layer.push(x);
-});
-
-var nodeGroup; /* = L.featureGroup(vis_layer)
-  .on("click", function () {
-    alert(`clicked on ${vis_layer}`);
-  })
-  .addTo(map);*/
-
-// Mouse event listener
-map.on("click", onMapClick);
-
+var nodeGroup;
 var marker;
 
+// Draw a square surrounding the cursor point and update visible markers
 function onMapClick(e) {
   // Remove previous marker
   marker?.remove();
@@ -69,22 +59,23 @@ function onMapClick(e) {
       [e.latlng.lat - 2, e.latlng.lng - 2],
       [e.latlng.lat + 2, e.latlng.lng + 2],
     ],
-    { opacity: 0.2 }
+    { opacity: 0.1 }
   );
 
-  revealNodes(
+  vis_layer = revealNodes(
     e.latlng.lng - 2,
     e.latlng.lng + 2,
     e.latlng.lat + 2,
     e.latlng.lat - 2
   );
+
+  // Write asset names to screen
+  asset_text = "";
+  vis_layer.forEach(
+    (e) => (asset_text += (asset_text ? ", " : "") + e.options.title)
+  );
+  document.getElementById("assets").textContent = `${asset_text}`;
+
   map.addLayer(marker);
   nodeGroup = L.featureGroup(vis_layer).addTo(map);
 }
-
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 17,
-  minZoom: 5,
-  attribution:
-    '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-}).addTo(map);
