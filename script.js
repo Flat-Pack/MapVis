@@ -3,15 +3,19 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 const sampleData = [
-  [-23, 141, "object 1"],
-  [-24, 144, "object 2"],
-  [-21, 143, "object 3"],
-  [-28, 145, "object 4"],
-  [-27, 150, "object 5"],
-  [-28, 151, "object 6"],
-  [-19, 145, "object 7"],
-  [-23, 148, "object 8"],
-  [-28, 149, "object 9"],
+  [-27.5, 153, "Brisbane"],
+  [-28, 153, "Gold Coast"],
+  [-26.4, 153, "Sunshine Coast"],
+  [-19, 146, "Townsville"],
+  [-17, 145.8, "Cairns"],
+  [-27, 151, "Toowoomba"],
+  [-21, 149, "Mackay"],
+  [-23.4, 150.5, "Rockhampton"],
+  [-25.3, 152.8, "Hervey Bay"],
+  [-20.4, 139.3, "Mount Isa"],
+  [-23.5, 148.2, "Emerald"],
+  [-28, 145.7, "Cunnamulla"],
+  [-23.4, 144.3, "Longreach"],
 ];
 
 // Set map from Leaflet 1.9.4
